@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const bcrypt = require("bcryptjs");
-const port = 8000;
+const port = 7000;
 app.use(express.json());
 const { user_Collection, data_Collection } = require("./connector");
 const bodyParser = require("body-parser");

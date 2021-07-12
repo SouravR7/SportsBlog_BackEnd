@@ -1,7 +1,11 @@
 const express = require("express");
 const app = express();
 const bcrypt = require("bcryptjs");
-const port = 7000;
+// var http = require('http');
+// var https = require('https');
+// var privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');
+// var certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
+const port = process.env.PORT ||7000;
 app.use(express.json());
 const { user_Collection, data_Collection } = require("./connector");
 const bodyParser = require("body-parser");

@@ -54,7 +54,7 @@ app.post("/api/create",upload.single('imgURL'), (req, res) => {
   const { description, title,date } = req.body;
   console.log(req.file.path);
   const newdata = new data_Collection({
-    imgURL : req.file.path,
+    imgURL : `https://sportsblog-backend.herokuapp.com/${req.file.path}`,
     description,
     title,
     date,

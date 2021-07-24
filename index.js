@@ -51,10 +51,10 @@ const upload = multer({
 // const upload = multer({dest: 'uploads/'})
 
 app.post("/api/create",upload.single('imgURL'), (req, res) => {
-  const { description, title,date } = req.body;
-  console.log(req.file.path);
+  const { description, title,date,imgData } = req.body;
+  console.log(imgData);
   const newdata = new data_Collection({
-    imgURL : `https://sportsblog-backend.herokuapp.com/${req.file.path}`,
+    imgURL : `https://sportsblog-backend.herokuapp.com/${imgData}`,
     description,
     title,
     date,

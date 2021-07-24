@@ -19,6 +19,16 @@ app.use(cors());
 
 const multer = require('multer'); //for file read
 
+
+app.use((req,res,next)=>{
+  res.setHeader('Access-Control-Allow-Origin','*');
+  res.setHeader('Access-Control-Allow-Headers','Origin,X-Requested-With,Content-Type, Accept, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE');
+
+  next();
+})
+
+
 //renaming & store the each upload image with date&time
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {

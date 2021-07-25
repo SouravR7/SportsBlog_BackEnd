@@ -2,6 +2,7 @@ const express = require("express");
 const path = require('path');
 const app = express();
 const bcrypt = require("bcryptjs");
+const connectMultiparty = require("connect-multiparty");
 // var http = require('http');
 // var https = require('https');
 // var privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');
@@ -16,7 +17,7 @@ var cors = require("cors");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
-
+//app.use(connectMultiparty());
 const multer = require('multer'); //for file read
 
 
@@ -62,7 +63,8 @@ const upload = multer({
 
 app.post("/api/create",upload.single('imgURL'), (req, res) => {
   const { description, title,date } = req.body;
-  console.log(req.file.path);
+  //console.log(req);
+  console.log(req.file);
   const newdata = new data_Collection({
     imgURL : `https://sportsblog-backend.herokuapp.com/${req.file.path}`,
     description,

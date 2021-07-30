@@ -1,12 +1,11 @@
 const express = require("express");
+const { cloudinary } = require('./utils/cloudinary_config');
 const path = require('path');
 const app = express();
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 const bcrypt = require("bcryptjs");
 const connectMultiparty = require("connect-multiparty");
-// var http = require('http');
-// var https = require('https');
-// var privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');
-// var certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
 const port = process.env.PORT ||7000;
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
@@ -61,28 +60,39 @@ const upload = multer({
 
 // const upload = multer({dest: 'uploads/'})
 
-app.post("/api/create",upload.single('imgURL'), (req, res) => {
-  const { description, title,date } = req.body;
+app.post("/api/create", async (req, res) => {
+  const { description, title,date,imgData } = req.body;
   //console.log(req);
-  console.log(req.file);
-  const newdata = new data_Collection({
-    imgURL : `https://sportsblog-backend.herokuapp.com/${req.file.path}`,
-    description,
-    title,
-    date,
-  });
+  try{
+    //for upload images in cloudinary
+    const uploadResponse = await cloudinary.uploader.upload(imgData, {
+    upload_preset: 'Sports_Blog_upload',
+    });
+    console.log(uploadResponse);
 
-  newdata
-    .save()
-    .then((data) => {
-      res.status(201).json({
-         msg: "Created Sucessfully",
-         product:{
-           data
-         }
-        })
-    })
-    .catch((err) => res.status(404).json({ msg: err.msg }));
+    const newdata = new data_Collection({
+      imgURL : uploadResponse.secure_url,
+      description,
+      title,
+      date,
+    });
+  
+    newdata
+      .save()
+      .then((data) => {
+        res.status(201).json({
+           msg: "Created Sucessfully",
+           product:{
+             data
+           }
+          })
+      })
+      .catch((err) => res.status(404).json({ msg: err.msg }));
+
+  }catch(e){
+    console.error(e);
+    return res.status(500).json({ err: 'Something went wrong' });
+  }
 });
 
 app.get("/api/get", (req, res) => {

@@ -50,4 +50,28 @@ router.post("/api/register", async (req, res) => {
     }
   });
 
+  router.get("/api/getAllUsers", async (req, res) => {
+    try{
+        let allUsers = await user_Collection.find();
+
+        if (!allUsers) {
+            return res.status(400).json({ msg: "No Records found" });
+          }
+    
+        let userMap = allUsers.map((users)=>{
+            return {
+                firstname: users.firstname,
+                lastname: users.lastname,
+                isAdmin: users.isAdmin,
+                email : users.email,
+            }
+        })
+
+        res.json(userMap)
+
+    } catch{
+        res.status(500).json({ err: err.message });
+    }
+  })
+
   module.exports = router;

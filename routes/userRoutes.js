@@ -74,4 +74,23 @@ router.post("/api/register", async (req, res) => {
     }
   })
 
+  router.put("/updateUser",async (req, res)=>{
+    const {email , value} = req.body;
+    try{
+      const existingUser = await user_Collection.findOne({email: email});
+      if(!existingUser){
+        res.status(400).json({ err: "User not found !!!" });
+      }
+
+      existingUser.isAdmin = value;
+
+      const saveData = await existingUser.save();
+    
+      res.json({msg: "User access updated"});
+
+    }catch(err){
+      res.status(500).json({ err: err.message });
+    }
+  })
+
   module.exports = router;

@@ -8,7 +8,7 @@ router.post("/api/register", async (req, res) => {
     try {
       const { firstname, lastname, password, email, isAdmin } = req.body;
       const existingUser = await user_Collection.findOne({ email: email });
-      if (existingUser) {
+      if (!existingUser) {
         return res.status(400).json({ msg: "User account already exists", });
       }
   

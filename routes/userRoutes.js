@@ -93,4 +93,21 @@ router.post("/api/register", async (req, res) => {
     }
   })
 
+  router.delete("/deleteUser",async (req, res)=>{
+    const { email } = req.body;
+    try{
+      const existingUser = await user_Collection.findOne({email: email});
+      if(!existingUser){
+        res.status(400).json({ err: "User not found !!!" });
+      }
+
+      await user_Collection.deleteOne({email: existingUser.email});
+    
+      res.json({msg: "User deleted sucessfully"});
+
+    }catch(err){
+      res.status(500).json({ err: err.message });
+    }
+  })
+
   module.exports = router;

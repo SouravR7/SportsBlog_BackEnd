@@ -1,113 +1,112 @@
-let express = require('express');
+let express = require("express");
 let router = express.Router();
 const bcrypt = require("bcryptjs");
 
 const { user_Collection, data_Collection } = require("../connector");
 
 router.post("/api/register", async (req, res) => {
-    try {
-      const { firstname, lastname, password, email, isAdmin } = req.body;
-      const existingUser = await user_Collection.findOne({ email: email });
-      if (existingUser) {
-        return res.status(400).json({ msg: "User account already exists", });
-      }
-  
-      const salt = await bcrypt.genSalt();
-      const passwordhash = await bcrypt.hash(password, salt);
-      const newUser = new user_Collection({
-        firstname,
-        lastname,
-        email,
-        password: passwordhash,
-      });
-      // console.log('newUser')
-      // console.log(newUser)
-      const savedUser = await newUser.save();
-      res.json(savedUser);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
+  try {
+    const { firstname, lastname, password, email, isAdmin } = req.body;
+    const existingUser = await user_Collection.findOne({ email: email });
+    if (existingUser) {
+      return res.status(400).json({ msg: "User account already exists" });
     }
-  });
-  
-  router.post("/api/login", async (req, res) => {
-    try {
-      const { email, password } = req.body;
-      const user = await user_Collection.findOne({ email: email });
-      if (!user) {
-        return res.status(400).json({ msg: "User account does not exists" });
-      }
-      const isMatch = await bcrypt.compare(password, user.password);
-      console.log(isMatch);
-      if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
-  
-      res.json({
-        id: user._id,
-        name: user.firstname,
-        isAdmin: user.isAdmin,
-      });
-    } catch (err) {
-      res.status(500).json({ err: err.message });
+
+    const salt = await bcrypt.genSalt();
+    const passwordhash = await bcrypt.hash(password, salt);
+    const newUser = new user_Collection({
+      firstname,
+      lastname,
+      email,
+      password: passwordhash,
+    });
+    // console.log('newUser')
+    // console.log(newUser)
+    const savedUser = await newUser.save();
+    res.json(savedUser);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post("/api/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await user_Collection.findOne({ email: email });
+    if (!user) {
+      return res.status(400).json({ msg: "User account does not exists" });
     }
-  });
+    const isMatch = await bcrypt.compare(password, user.password);
+    console.log(isMatch);
+    if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
-  router.get("/api/getAllUsers", async (req, res) => {
-    try{
-        let allUsers = await user_Collection.find();
+    res.json({
+      id: user._id,
+      first_name: user.firstname,
+      last_name: user.lastname,
+      email: user.email,
+      isAdmin: user.isAdmin,
+    });
+  } catch (err) {
+    res.status(500).json({ err: err.message });
+  }
+});
 
-        if (!allUsers) {
-            return res.status(400).json({ msg: "No Records found" });
-          }
-    
-        let userMap = allUsers.map((users)=>{
-            return {
-                firstname: users.firstname,
-                lastname: users.lastname,
-                isAdmin: users.isAdmin,
-                email : users.email,
-            }
-        })
+router.get("/api/getAllUsers", async (req, res) => {
+  try {
+    let allUsers = await user_Collection.find();
 
-        res.json(userMap)
-
-    } catch{
-        res.status(500).json({ err: err.message });
+    if (!allUsers) {
+      return res.status(400).json({ msg: "No Records found" });
     }
-  })
 
-  router.put("/updateUser",async (req, res)=>{
-    const {email , value} = req.body;
-    try{
-      const existingUser = await user_Collection.findOne({email: email});
-      if(!existingUser){
-        res.status(400).json({ err: "User not found !!!" });
-      }
+    let userMap = allUsers.map((users) => {
+      return {
+        firstname: users.firstname,
+        lastname: users.lastname,
+        isAdmin: users.isAdmin,
+        email: users.email,
+      };
+    });
 
-      existingUser.isAdmin = value;
+    res.json(userMap);
+  } catch {
+    res.status(500).json({ err: err.message });
+  }
+});
 
-      const saveData = await existingUser.save();
-    
-      res.json({msg: "User access updated"});
-
-    }catch(err){
-      res.status(500).json({ err: err.message });
+router.put("/updateUser", async (req, res) => {
+  const { email, value } = req.body;
+  try {
+    const existingUser = await user_Collection.findOne({ email: email });
+    if (!existingUser) {
+      res.status(400).json({ err: "User not found !!!" });
     }
-  })
 
-  router.delete("/deleteUser",async (req, res)=>{
-    const { email } = req.body;
-    try{
-      const existingUser = await user_Collection.findOne({email: email});
-      if(!existingUser){
-        res.status(400).json({ err: "User not found !!!" });
-      }
+    existingUser.isAdmin = value;
 
-      await user_Collection.deleteOne({email: existingUser.email});
-    
-      res.json({msg: "User deleted sucessfully"});
+    const saveData = await existingUser.save();
 
-    }catch(err){
-      res.status(500).json({ err: err.message });
+    res.json({ msg: "User access updated" });
+  } catch (err) {
+    res.status(500).json({ err: err.message });
+  }
+});
+
+router.delete("/deleteUser", async (req, res) => {
+  const { email } = req.body;
+  try {
+    const existingUser = await user_Collection.findOne({ email: email });
+    if (!existingUser) {
+      res.status(400).json({ err: "User not found !!!" });
     }
-  })
 
-  module.exports = router;
+    await user_Collection.deleteOne({ email: existingUser.email });
+
+    res.json({ msg: "User deleted sucessfully" });
+  } catch (err) {
+    res.status(500).json({ err: err.message });
+  }
+});
+
+module.exports = router;

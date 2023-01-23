@@ -1,7 +1,6 @@
 let express = require("express");
 let router = express.Router();
 const bcrypt = require("bcryptjs");
-
 const { user_Collection, data_Collection } = require("../connector");
 
 router.post("/api/register", async (req, res) => {
